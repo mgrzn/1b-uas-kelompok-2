@@ -1,0 +1,452 @@
+#include<iostream>
+#include<string.h>
+#include <iomanip>
+#include <ctime>
+using namespace std;
+
+			//Class Pelanggan
+class Pelanggan
+{
+	string Nama;	   			 //Pelanggan FULL Nama
+	string alamat;				//Pelanggan ALAMAT
+	string phone;				//CONTACT NOMOR
+	int hari=0;	    			//LAMA INAP
+	float bayar_dp;		//DP kamar
+	double bill=0;				//BILL
+	int booking_id;				//BOOKING ID
+	int kamar;					//kamar NO
+	int status;
+public:
+	Pelanggan()
+{
+		hari=0;
+		bayar_dp=0;
+		bill=0;
+		booking_id=0;
+		status=0;
+		kamar=0;
+}
+	void accept();				//ACCEPT Pelanggan
+	void display();				//DISPLAY Pelanggan
+	friend class kamar;
+	friend class Hotel;
+};
+void Pelanggan::accept()		//ACCEPTING Pelanggan DETAILS
+{
+	cout<<"MASUKAN Nama: ";
+	getline(cin, Nama);
+	getline(cin, Nama);
+	cout<<"MASUKAN Alamat: ";
+	getline(cin,alamat);
+	flag:
+	cout<<"MASUKAN Nomor HP: ";
+	cin>>phone;
+	for(int i=0;i<(phone.length());i++)
+  	{									//NO HARUS 11 ANGKA
+		if(!isdigit(phone[i]))
+		{
+			cout<<"Pastikan Nomor Seusai Digit Ketentuan\n";
+			goto flag;
+		}
+  	}
+  	if(phone.length()!=11)		//CHECK NOMOR
+  	{
+  	  cout<<"Nomor Hp Harus 11 digits.\n";
+  	  goto flag;
+ 	 }
+}
+//
+
+void Pelanggan::display()		//DISPLAY Pelanggan
+{
+	cout<<booking_id<<"\t\t";
+	cout<<"| "<<left<<setfill(' ')<<setw(30)<<Nama;
+	cout<<"| "<<phone<<"\t\t\t";
+	cout<<"| "<<left<<setfill(' ')<<setw(30)<<alamat;
+	cout<<"| "<<kamar<<"\t\t\t";
+	if(status==1){cout<<"|\t\t-\t\t|"<<endl;}
+	else{cout<<"|\tCHECKED OUT.\t\t|"<<endl;}
+}
+    //CLASS kamar
+	//UNTUK MENYIMPAN DATA SELURUH HOTEL
+class kamar
+{
+	char type;				//COMFORT SUITE / NORMAL kamar
+	char stype;				//BIG SIZE OR SMALL SIZED kamar
+	char ac;				//AC OR NON AC
+	int kamarNOMOR;			//kamar NOMOR
+	double rent;			//HARGA
+	int status=0;			//kamar STATUS
+public:
+	friend class Hotel;
+	void acceptkamar(int rno);	//MENAMBAHKAN kamar KE DATA
+	void displaykamar();		//DISPLAY kamar
+	kamar()
+	{
+		type='\0';
+		stype='\0';
+		ac='\0';
+		kamarNOMOR=0;
+		rent=0;
+		status=0;
+	}
+};
+void kamar::acceptkamar(int rno)		//ALL kamar DETAILS
+{
+	kamarNOMOR=rno;	//kamar NOMOR
+	cout<<"Type AC/Non-AC (A/N) : ";
+	cin>>ac;
+	while(ac!='A'&& ac!='N')		//VALIDATIONS
+	{
+		cout<<" Mohon Masukan Kembali Type: AC/Non-AC (A/N) : ";
+		cin>>ac;
+	}
+	cout<<"Type Comfort Suite or Normal (S/N) : ";
+	cin>>type;
+	while(type!='S' && type!='N')
+	{
+		cout<<"Mohon Masukan Kembali Type Comfort Suite or Normal (S/N) : ";
+		cin>>type;
+	}
+	cout<<"Type Size (B/S) : ";
+	cin>>stype;
+	while(stype!='B'&& stype!='S')
+	{
+		cout<<"Mohon Masukan Kembali Type Size (B/S) : ";
+		cin>>stype;
+	}
+	cout<<"Harga  : ";
+	cin>>rent;
+	while(rent<0 || rent>2000000)
+	{
+		cout<<"Mohon Masukan Dengan valid .";
+		cin>>rent;
+	}
+	status=0;	//BOOKING STATUS
+	cout<<"\nkamar Added Successfully!"<<endl;
+}
+void kamar::displaykamar()
+{
+	cout<<"| "<<kamarNOMOR<<".\t\t|\t"<<ac<<"\t\t|\t"<<type<<"\t\t|\t"<<stype<<"\t\t|\t"<<rent<<"\t\t|\t";
+	if(status==0){cout<<"Available.\t|";}
+	else{cout<<"Booked.\t\t|";}
+	cout<<endl;
+}
+//class Hotel
+class Hotel
+{
+	kamar a[100];			//ARRAY kamar
+	Pelanggan c[100];			//ARRAY Pelanggan
+	int nkamar=0, ncust=0;	//kamar DAN Pelanggan SET 0
+public:
+	void addkamars();		//MENAMBAHKAN kamar KE DATA
+	void searchkamar();		//MENCARI kamar
+	void CheckIn();			// Pelanggan CHECKIN
+	void searchcust();		//CARI Pelanggan DI HOTEL
+	void availability();	//CHECK KETERSEDIAAN kamar
+	void CheckOut();		//CHECKOUT DAN PEMBYARAN SISA BILL
+	void Summary();			//REKAP CUST
+};
+void Hotel::addkamars()
+{
+	int rno;
+	cout<<"MASUKAN NOMOR KAMAR : ";
+	cin>>nkamar;
+	while(nkamar<=0)
+	{
+		cout<<"Invalid. MASUKAN NOMOR KAMAR YAGG VALID.";
+		cin>>nkamar;
+	}
+	for(int i=0;i<nkamar;i++)
+	{
+		cout<<"kamar "<<(i+1)<<endl;
+		flag:
+		cout<<endl<<"MASUKAN NOMOR KAMAR : ";
+		cin>>rno;
+		if(rno<=0)
+		{
+			cout<<endl<<"NOMOR KAMAR is invalid! MOHN MASUKAN KEMBALI NOMOR KAMAR : ";
+			goto flag;
+		}
+		for(int i=0; i<nkamar;i++)
+		{
+			if(a[i].kamarNOMOR==rno)
+			{
+				cout<<"Invalid. NOMOR KAMAR."<<endl;
+				goto flag;
+			}
+		}
+		a[i].acceptkamar(rno);		//MEMANGGIL FUNCTION ACCEPT kamar DARI CLASS kamar
+	}
+}
+void Hotel::availability()		//CHECK KETERSEDIAAN kamar
+{
+	if(nkamar==0)
+	{
+		cout<<"MOHON MASUKAN DATA KAMAR."<<endl;
+		return;
+	}
+	cout<<"KAMAR YANG TERSEDIA :"<<endl;
+	cout<<"| KAMAR No.\t|\tAC/Non-AC\t|\tType\t\t|\tStype\t\t|\tRent\t\t|\tAvailability  \t|"<<endl;
+	for(int i=0;i<nkamar;i++)
+	{
+		a[i].displaykamar();	//DISPLAY kamar
+	}
+}
+void Hotel::searchkamar()	//MENCARI kamar
+{
+	if(nkamar==0)
+	{
+		cout<<"MOHON MASUKAN DATA KAMAR."<<endl;
+		return;
+	}
+	int flag=0;
+	char ac1, type1, stype1;
+	cout<<" AC or Non-AC? (A/N): "<<endl;
+	cin>>ac1;
+	cout<<"suite or normal ?"<<endl;
+	cin>>type1;
+	cout<<"Size? (B/S)"<<endl;
+	cin>>stype1;
+	for(int i=0;i<nkamar;i++)
+	{
+		if(a[i].ac==ac1 && a[i].type==type1 && a[i].stype==stype1)
+		{
+			flag=1;
+			cout<<"kamar ketemu"<<endl;
+			a[i].displaykamar();
+		}
+	}
+	if(flag==0)
+	{
+		cout<<"Tidak ada kamar yg tersedia."<<endl;
+	}
+}
+void Hotel::CheckIn()		//CHECK IN Pelanggan
+{
+	if(nkamar==0)
+	{
+		cout<<"MOHON MASUKAN DATA KAMAR"<<endl;
+		return;
+	}
+	int i, rno;
+	if(ncust<=nkamar){	//CHECK kamar
+		c[ncust].booking_id=ncust+1;
+		flag:
+		int flag1=0;
+		cout<<"MASUKA NOMOR KAMAR =";
+		cin>>rno;
+		for(i=0;i<nkamar; i++){
+			if(rno==a[i].kamarNOMOR)
+			{
+				flag1=1;
+				break;
+			}
+		}
+		if(flag1==0){
+			cout<<"Invalid . again.\n";
+			goto flag;
+		}
+		if(a[i].status==0)		//CHECK kamar KOSONG
+		{
+			char ch2;
+			cout<<"kamar available."<<endl;
+			a[i].displaykamar();
+			cout<<"Continue? Press(Y/y)";		//KONFIRMASI ULANG
+			cin>>ch2;
+			if(ch2=='Y'||ch2=='y')
+			{
+				c[ncust].accept();
+				cout<<"Berapa Hari Akan Menginap : ";
+				cin>>c[ncust].hari;
+				c[ncust].bill = c[ncust].hari*a[i].rent;		//HITUNG BILL = JUMLAH HARI * HARGA SEWA.
+				cout<<"Your total bill Rp."<<(c[ncust].bill)<<"\nPembayaran Dp = ";
+				cin>>c[ncust].bayar_dp;
+				while(c[ncust].bayar_dp<c[ncust].bill/4||c[ncust].bayar_dp>c[ncust].bill)
+				{
+					cout<<"Invalid .";
+					cin>>c[ncust].bayar_dp;
+				}
+				cout<<"Thank you. Booking confirmed."<<endl;		//confirmed booking
+				cout<<"--------------------------------------------------------------"<<endl;		//printing booking
+				cout<<"Booking Id: "<<c[ncust].booking_id<<"\nNama: "<<c[ncust].Nama<<"\nkamar no.: "<<rno<<"\nDate: ";
+				time_t my_time = time(NULL);
+						// ctime() DIGUNAKAN UNTUK MENAMPILKAN WAKTU SKRNG
+				printf("%s", ctime(&my_time));
+				a[i].status=1;		//Mengubah status kamar ke booked
+				c[ncust].kamar=rno;
+				c[ncust].status=1;
+				ncust++;
+			}
+			else
+			{
+				goto flag;
+			}
+		}
+		else
+		{
+			cout<<"KAMAR PENUH. cari kamar lain ."<<endl;
+		}
+	}
+	else
+	{
+		cout<<"Sorry! Hotel is Full."<<endl;
+	}
+}
+void Hotel::searchcust()
+{
+	int id, flag=0;
+	cout<<"MASUKAN booking id of Pelanggan.";
+	cin>>id;
+	for(int i=0;i<=ncust;i++)
+	{
+		if(c[i].booking_id==id)
+		{
+			cout<<"\t\t\t Nama"<<setw(20);
+			cout<<"\t\t\t Phone"<<setw(20);
+			cout<<"\t\t\t alamat"<<setw(20);
+			cout<<"\t\t\tkamar no: "<<setw(20)<<endl;
+			c[i].display();
+			flag=1;
+		}
+	}
+	if(flag==0)
+	{
+		cout<<"Not found."<<endl;
+	}
+}
+void Hotel::CheckOut()
+{
+	int rno, i, j;
+	cout<<"MASUKAN NOMOR= ";
+	cin>>rno;
+	for(j=0;j<nkamar; j++){
+		if(rno==a[j].kamarNOMOR)
+		{
+			break;
+		}
+	}
+	if(a[j].status==0)
+	{
+		cout<<"Invalid."<<endl;
+	}
+	for(i=0;i<ncust;i++)
+	{
+		if(c[i].kamar==rno)
+		{
+			cout<<"CHECKING OUT.";
+			time_t my_time = time(NULL);
+						// ctime() DIGUNAKAN UNTUK MENAMPILKAN WAKTU SKRNG
+				printf("%s", ctime(&my_time));
+				a[i].status=1;		//Mengubah status kamar ke booked
+				c[ncust].kamar=rno;
+				c[ncust].status=1;
+				ncust++;
+			c[i].display();		//Pelanggan DETAILS
+			cout<<"Your total bill : "<<c[i].bill<<endl;
+			cout<<"Jmlah Dp: "<<c[i].bayar_dp;
+			cout<<endl<<"Total Jumalah Yang Harus Dibayar = Rp."<<c[i].bill-c[i].bayar_dp;
+			cout<<endl<<"Thank you! Visit Again :)"<<endl;
+			a[j].status=0;	//UBAH STATUS kamar
+			c[i].status=0;	//CHECKED OUT
+			break;
+		}
+	}
+}
+void Hotel::Summary()		//PRINTING LIST  ALL PelangganS
+{
+	if(nkamar==0)
+	{
+		cout<<"No Pelanggans as yet."<<endl;
+		return;
+	}
+	cout<<"Guest Summary:"<<endl;
+	cout<<"Id.\t\t";
+	cout<<"|	Nama	\t\t";
+	cout<<"|	Phone	\t\t";
+	cout<<"|	alamat	\t\t";
+	cout<<"|	kamar no	: \t";
+	cout<<"|	Status	\t\t|"<<endl;
+	for(int i=0;i<ncust;i++)
+	{
+		c[i].display();
+	}
+}
+
+int main()
+{
+	Hotel mahjong;		//OBJECT CLASS HOTEL
+	char ch;
+	cout<<endl<<"============WELCOME TO MAhJONG HOTELS==========";
+	do
+	{  cout << endl;
+        cout <<
+				"MENU : \n"
+				"1.LOGIN SEBAgAI ADMIN\n"
+				"2.LOGIN SEBAGAI PELANGGAN\n"
+				"3.EXIT\n"
+				"MASUKAN :";
+		cin>>ch;
+		switch(ch)
+		{
+		case '1':
+			cout<<"Tammbah database kamar hotel:"<<endl;
+			mahjong.addkamars();
+			cout<<"Database updated. Going back to main menu."<<endl;
+			break;
+		case '2':
+			char ch1;
+			do
+			{
+
+				cout<<endl<<"*************************************************************************************************************************************************************************************************"<<endl;
+				cout<<"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~WELCOME TO MAHJONG HOTELS~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"<<endl;
+				cout<<"\n\t\t\t\t\t\t\t\t\t\t\t"
+						"Menu:\n\t\t\t\t\t\t\t\t\t\t\t"
+						"1.Check Ketersediaan kamar.\n\t\t\t\t\t\t\t\t\t\t\t"
+						"2.Search kamar\n\t\t\t\t\t\t\t\t\t\t\t"
+						"3.Check In\n\t\t\t\t\t\t\t\t\t\t\t"
+						"4.Search Pelanggan\n\t\t\t\t\t\t\t\t\t\t\t"
+						"5.Guest Summary\n\t\t\t\t\t\t\t\t\t\t\t"
+						"6.Checkout.\n\t\t\t\t\t\t\t\t\t\t\t"
+						"7.Go back to Main Menu.\n\t\t\t\t\t\t\t\t\t\t\t"
+						"MASUKAN :";
+				cin>>ch1;
+				switch(ch1)
+				{
+				case '1':
+					mahjong.availability();
+					break;
+				case '2':
+					mahjong.searchkamar();
+					break;
+				case '3':
+					mahjong.CheckIn();
+					break;
+				case '4':
+					mahjong.searchcust();
+					break;
+				case '5':
+					mahjong.Summary();
+					break;
+				case '6':
+					mahjong.CheckOut();
+					break;
+				case '7':
+					break;
+				default:
+					cout<<"Invalid Choice."<<endl;
+					break;
+				}
+			}while(ch1!='7');
+			break;
+		case '3':
+			cout<<"Thank you!";
+			exit(0);
+		default:
+			cout<<"Invalid Choice."<<endl;
+			break;
+		}
+	}while(ch!='3');
+	return 0;
+}

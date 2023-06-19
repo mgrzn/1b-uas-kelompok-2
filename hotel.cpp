@@ -10,9 +10,9 @@ struct Pengunjung {
     Pengunjung* next;
 };
 
-// Deklarasi queue
-queue<Pengunjung> pengunjungQueue;
+// Deklarasi linked list
 Pengunjung* head = NULL;
+Pengunjung* tail = NULL;
 
 // Fungsi untuk memeriksa ketersediaan kamar
 bool isKamarTersedia(int nomorkamar) {
@@ -26,7 +26,7 @@ bool isKamarTersedia(int nomorkamar) {
     return true;  // Kamar tersedia
 }
 
-// Fungsi untuk menambahkan pengunjung baru ke dalam antrian
+// Fungsi untuk menambahkan pengunjung baru ke dalam linked list dan queue
 void tambahPengunjung(string nama, int lamaMenginap, string notelp, int nomorkamar) {
     Pengunjung* pengunjungBaru = new Pengunjung;
     pengunjungBaru->nama = nama;
@@ -35,24 +35,78 @@ void tambahPengunjung(string nama, int lamaMenginap, string notelp, int nomorkam
     pengunjungBaru->nomorkamar = nomorkamar;
     pengunjungBaru->next = NULL;
 
-    if (head == NULL) {
-        head = pengunjungBaru;
-    } else {
-        Pengunjung* temp = head;
-        while (temp->next != NULL) {
-            temp = temp->next;
-        }
-        temp->next = pengunjungBaru;
-    }
-
     if (isKamarTersedia(nomorkamar)) {
-        pengunjungQueue.push(*pengunjungBaru); // Tambahkan pengunjung ke dalam queue
+        // Tambahkan pengunjung ke dalam linked list
+        if (head == NULL) {
+            head = pengunjungBaru;
+            tail = pengunjungBaru;
+        } else {
+            tail->next = pengunjungBaru;
+            tail = pengunjungBaru;
+        }
+
+        // Tambahkan pengunjung ke dalam queue
+        queue<Pengunjung> pengunjungQueue;
+        pengunjungQueue.push(*pengunjungBaru);
+
         cout << "\nPengunjung dengan nama " << nama << " telah ditambahkan di kamar " << nomorkamar << endl;
     } else {
         cout << "Kamar " << nomorkamar << " sudah dipesan\n";
     }
 }
 
+// Fungsi untuk menghapus pengunjung dari linked list
+void hapusPengunjung(string nama) {
+    if (nama == "0") {
+        return;
+    }
+
+    Pengunjung* curr = head;
+    Pengunjung* prev = NULL;
+    bool pengunjungDitemukan = false;
+
+    while (curr != NULL) {
+        if (curr->nama == nama) {
+            if (prev == NULL) {
+                // Jika pengunjung yang ingin dihapus berada di head
+                head = curr->next;
+            } else {
+                prev->next = curr->next;
+            }
+            delete curr;
+            pengunjungDitemukan = true;
+            break;
+        }
+        prev = curr;
+        curr = curr->next;
+    }
+
+    if (pengunjungDitemukan) {
+        cout << "Pengunjung dengan nama " << nama << " telah dihapus dari antrian." << endl;
+    } else {
+        cout << "Pengunjung dengan nama " << nama << " tidak ditemukan." << endl;
+    }
+}
+
+// Fungsi untuk menampilkan daftar pengunjung yang sedang menginap
+void tampilDaftarPengunjung() {
+    Pengunjung* temp = head;
+
+    if (temp == NULL) {
+        cout << "Tidak ada pengunjung yang sedang menginap." << endl;
+        return;
+    }
+
+    cout << "\nDaftar Pengunjung yang Sedang Menginap:" << endl;
+    while (temp != NULL) {
+        cout << "Nama: " << temp->nama << endl;
+        cout << "Lama Menginap: " << temp->lamaMenginap << " hari" << endl;
+        cout << "Nomor Telepon: " << temp->notelp << endl;
+        cout << "Nomor Kamar: " << temp->nomorkamar << endl;
+        cout << "-------------------------" << endl;
+        temp = temp->next;
+    }
+}
 
 // Fungsi untuk menampilkan kamar-kamar yang tersedia
 void tampilKamarTersedia() {
@@ -74,72 +128,17 @@ void tampilKamarTersedia() {
     }
 }
 
-// Fungsi untuk menghapus pengunjung dari antrian
-void hapusPengunjung(string nama) {
-    if (nama == "0") {
-        return;
-    }
-
-    queue<Pengunjung> tempQueue; // Queue sementara untuk menyimpan pengunjung
-    bool pengunjungDitemukan = false;
-
-    // Looping seluruh pengunjung dalam queue
-    while (!pengunjungQueue.empty()) {
-        // Ambil pengunjung dari depan queue
-        // dan masukkan ke dalam queue sementara
-        // jika namanya tidak sama dengan nama yang ingin dihapus
-        // jika namanya sama, maka abaikan (hapus)
-        Pengunjung pengunjung = pengunjungQueue.front();
-        pengunjungQueue.pop();
-
-        if (pengunjung.nama != nama) {
-            tempQueue.push(pengunjung);
-        } else {
-            pengunjungDitemukan = true;
-        }
-    }
-
-    pengunjungQueue = tempQueue; // Isi queue dengan queue sementara
-
-    if (pengunjungDitemukan) {
-        cout << "Pengunjung dengan nama " << nama << " telah dihapus dari antrian." << endl;
-    } else {
-        cout << "Pengunjung dengan nama " << nama << " tidak ditemukan." << endl;
-    }
-}
-
-// Fungsi untuk menampilkan daftar pengunjung yang sedang menginap
-void tampilDaftarPengunjung() {
-    queue<Pengunjung> tempQueue = pengunjungQueue; // Queue sementara untuk menyimpan pengunjung
-
-    // Jika queue kosong, maka tidak ada pengunjung yang sedang menginap
-    if (tempQueue.empty()) {
-        cout << "Tidak ada pengunjung yang sedang menginap." << endl;
-        return;
-    }
-
-    cout << "\nDaftar Pengunjung yang Sedang Menginap:" << endl;
-    while (!tempQueue.empty()) {
-        Pengunjung pengunjung = tempQueue.front();
-        tempQueue.pop();
-        cout << "Nama: " << pengunjung.nama << endl;
-        cout << "Lama Menginap: " << pengunjung.lamaMenginap << " hari" << endl;
-        cout << "Nomor Telepon: " << pengunjung.notelp << endl;
-        cout << "Nomor Kamar: " << pengunjung.nomorkamar << endl;
-        cout << "-------------------------" << endl;
-    }
-}
-
 int main() {
     int pilihan;
     string nama;
     int lamaMenginap;
     string notelp;
     int nomorkamar;
+    char ulangi;
 
     do {
-            //system("cls");
-        cout << "\n=== Aplikasi Pemesanan Hotel ===" << endl;
+            system("cls");
+        cout << "\n=== Aplikasi Hotel ===" << endl;
         cout << "1. Tambah Pengunjung" << endl;
         cout << "2. Hapus Pengunjung" << endl;
         cout << "3. Tampilkan Daftar Pengunjung" << endl;
@@ -150,35 +149,79 @@ int main() {
 
         switch (pilihan) {
             case 1:
-                cout << "Masukkan Nama Pengunjung: ";
-                cin >> nama;
-                cout << "Masukkan Lama Menginap (dalam hari): ";
-                cin >> lamaMenginap;
-                cout << "Masukkan Nomor Telepon: ";
-                cin >> notelp;
-                cout << "Masukkan Nomor Kamar: ";
-                cin >> nomorkamar;
-                tambahPengunjung(nama, lamaMenginap, notelp, nomorkamar);
+                do {
+                    system("cls");
+                    cout << "Pilihan Kamar yang Tersedia" << endl;
+                    tampilKamarTersedia();
+
+                    // Memasukkan nomor kamar dan nama pemesan
+                    cout << "\n== KETIK 0 UNTUK KEMBALI KE MENU AWAL ==";
+                    cout << "\nMasukkan nomor kamar yang ingin dipesan: ";
+                    cin >> nomorkamar;
+
+                    if(nomorkamar == 0)
+                    {
+                        break;
+                    }
+
+                    if (nomorkamar>0 && nomorkamar <=10){
+                        if (isKamarTersedia(nomorkamar)) {
+                            cout << "Masukkan nama pengunjung: ";
+                            cin >> nama;
+                            cout << "Masukkan lama menginap (dalam hari): ";
+                            cin >> lamaMenginap;
+                            cout << "Masukkan Nomor HP : ";
+                            cin >> notelp;
+                            tambahPengunjung(nama, lamaMenginap,notelp, nomorkamar);
+                        } else {
+                            cout << "Kamar " << nomorkamar << " sudah dipesan\n";
+                        }
+                    }else {
+                        cout << "\nKamar " << nomorkamar << " Tidak tersedia..." << endl;
+                        cout << "Harap periksa nomor kamar yang diinput!" << endl;
+                    }
+
+                    // Memeriksa apakah pengguna ingin memesan kamar lagi
+                    cout << "\nIngin memesan kamar lagi? (y/n): ";
+                    cin >> ulangi;
+                    } while (ulangi == 'y' || ulangi == 'Y');
+
+
                 break;
             case 2:
-                cout << "Masukkan Nama Pengunjung yang Ingin Dihapus (0 untuk batal): ";
+                system("cls");
+                if (head == NULL) {
+                    cout << "Tidak ada pengunjung di kamar." << endl;
+                    system("pause");
+                    break;
+                }
+                cout << "\n== Hapus Pengunjung ==" << endl;
+                cout << "== KETIK 0 UNTUK KEMBALI KE MENU AWAL ==\n";
+                cout << "Masukkan nama pengunjung yang akan dihapus: ";
                 cin >> nama;
                 hapusPengunjung(nama);
+                system("pause");
                 break;
             case 3:
+                system("cls");
+                cout << "\n== Tampil Data Pengunjung ==" << endl;
                 tampilDaftarPengunjung();
+                system("pause");
                 break;
             case 4:
+                system("cls");
                 tampilKamarTersedia();
+                system("pause");
                 break;
             case 0:
-                cout << "Terima kasih!" << endl;
+                system("cls");
+                cout << "Terima kasih! Sampai jumpa." << endl;
                 break;
             default:
                 cout << "Pilihan tidak valid. Silakan coba lagi." << endl;
+                system("pause");
         }
     } while (pilihan != 0);
 
     return 0;
 }
-

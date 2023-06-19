@@ -7,39 +7,52 @@ struct Pengunjung {
     int lamaMenginap;
     string notelp;
     int nomorkamar;
+    Pengunjung* next;
 };
 
 // Deklarasi queue
 queue<Pengunjung> pengunjungQueue;
+Pengunjung* head = NULL;
 
 // Fungsi untuk memeriksa ketersediaan kamar
 bool isKamarTersedia(int nomorkamar) {
-    queue<Pengunjung> tempQueue = pengunjungQueue;
-    while (!tempQueue.empty()) {
-        Pengunjung pengunjung = tempQueue.front();
-        if (pengunjung.nomorkamar == nomorkamar) {
+    Pengunjung* temp = head;
+    while (temp != nullptr) {
+        if (temp->nomorkamar == nomorkamar) {
             return false;  // Kamar sudah dipesan
         }
-        tempQueue.pop();
+        temp = temp->next;
     }
     return true;  // Kamar tersedia
 }
 
 // Fungsi untuk menambahkan pengunjung baru ke dalam antrian
 void tambahPengunjung(string nama, int lamaMenginap, string notelp, int nomorkamar) {
-    Pengunjung pengunjung;
-    pengunjung.nama = nama;
-    pengunjung.lamaMenginap = lamaMenginap;
-    pengunjung.notelp = notelp;
-    pengunjung.nomorkamar = nomorkamar;
+    Pengunjung* pengunjungBaru = new Pengunjung;
+    pengunjungBaru->nama = nama;
+    pengunjungBaru->lamaMenginap = lamaMenginap;
+    pengunjungBaru->notelp = notelp;
+    pengunjungBaru->nomorkamar = nomorkamar;
+    pengunjungBaru->next = NULL;
+
+    if (head == NULL) {
+        head = pengunjungBaru;
+    } else {
+        Pengunjung* temp = head;
+        while (temp->next != NULL) {
+            temp = temp->next;
+        }
+        temp->next = pengunjungBaru;
+    }
 
     if (isKamarTersedia(nomorkamar)) {
-        pengunjungQueue.push(pengunjung); // Tambahkan pengunjung ke dalam queue
+        pengunjungQueue.push(*pengunjungBaru); // Tambahkan pengunjung ke dalam queue
         cout << "\nPengunjung dengan nama " << nama << " telah ditambahkan di kamar " << nomorkamar << endl;
     } else {
         cout << "Kamar " << nomorkamar << " sudah dipesan\n";
     }
 }
+
 
 // Fungsi untuk menampilkan kamar-kamar yang tersedia
 void tampilKamarTersedia() {
@@ -76,7 +89,7 @@ void hapusPengunjung(string nama) {
         // dan masukkan ke dalam queue sementara
         // jika namanya tidak sama dengan nama yang ingin dihapus
         // jika namanya sama, maka abaikan (hapus)
-        Pengunjung pengunjung = pengunjungQueue.front(); 
+        Pengunjung pengunjung = pengunjungQueue.front();
         pengunjungQueue.pop();
 
         if (pengunjung.nama != nama) {
@@ -98,7 +111,7 @@ void hapusPengunjung(string nama) {
 // Fungsi untuk menampilkan daftar pengunjung yang sedang menginap
 void tampilDaftarPengunjung() {
     queue<Pengunjung> tempQueue = pengunjungQueue; // Queue sementara untuk menyimpan pengunjung
-    
+
     // Jika queue kosong, maka tidak ada pengunjung yang sedang menginap
     if (tempQueue.empty()) {
         cout << "Tidak ada pengunjung yang sedang menginap." << endl;
@@ -106,8 +119,6 @@ void tampilDaftarPengunjung() {
     }
 
     cout << "\nDaftar Pengunjung yang Sedang Menginap:" << endl;
-    // Looping seluruh pengunjung dalam queue
-    // dan tampilkan nama, lama menginap, nomor telepon, dan nomor kamar
     while (!tempQueue.empty()) {
         Pengunjung pengunjung = tempQueue.front();
         tempQueue.pop();
@@ -127,7 +138,7 @@ int main() {
     int nomorkamar;
 
     do {
-            system("cls");
+            //system("cls");
         cout << "\n=== Aplikasi Pemesanan Hotel ===" << endl;
         cout << "1. Tambah Pengunjung" << endl;
         cout << "2. Hapus Pengunjung" << endl;

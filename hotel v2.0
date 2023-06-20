@@ -1,6 +1,7 @@
 #include <iostream>
-#include <queue> // Library untuk queue
-#include <cstdlib> // Library untuk menggunakan fungsi rand()
+#include <queue>
+#include <cstdlib>
+#include <ctime>
 using namespace std;
 
 struct Pengunjung {
@@ -8,37 +9,36 @@ struct Pengunjung {
     int lamaMenginap;
     string notelp;
     int nomorkamar;
-    int kodebooking; // Penambahan kode booking
+    int kodebooking;
     Pengunjung* next;
 };
+time_t my_time = time(NULL);
 
-// Deklarasi linked list
+// Linked list variables
 Pengunjung* head = NULL;
 Pengunjung* tail = NULL;
 
 
-// Fungsi untuk memeriksa ketersediaan kamar
 bool isKamarTersedia(int nomorkamar) {
     Pengunjung* temp = head;
     while (temp != nullptr) {
         if (temp->nomorkamar == nomorkamar) {
-            return false;  // Kamar sudah dipesan
+            return false;
         }
         temp = temp->next;
     }
-    return true;  // Kamar tersedia
+    return true;
 }
 
-// Fungsi untuk menghasilkan nomor pesanan acak
 int generateKodeBooking() {
-    return rand() % 9999 + 1000; // Menghasilkan kode booking antara 1000 dan 9999
+    srand (time(NULL));
+    int random = rand() % 9999 + 1000;
+    return random;
 }
 
-// Fungsi untuk menambahkan pengunjung baru ke dalam linked list dan queue
 void tambahPengunjung(string nama, int lamaMenginap, string notelp, int nomorkamar) {
     Pengunjung* pengunjungBaru = new Pengunjung;
-    pengunjungBaru->kodebooking = generateKodeBooking(); // Menghasilkan nomor pesanan acak
-    pengunjungBaru->nama = nama;
+    pengunjungBaru->kodebooking = generateKodeBooking();
     pengunjungBaru->nama = nama;
     pengunjungBaru->lamaMenginap = lamaMenginap;
     pengunjungBaru->notelp = notelp;
@@ -46,7 +46,6 @@ void tambahPengunjung(string nama, int lamaMenginap, string notelp, int nomorkam
     pengunjungBaru->next = NULL;
 
     if (isKamarTersedia(nomorkamar)) {
-        // Tambahkan pengunjung ke dalam linked list
         if (head == NULL) {
             head = pengunjungBaru;
             tail = pengunjungBaru;
@@ -55,11 +54,9 @@ void tambahPengunjung(string nama, int lamaMenginap, string notelp, int nomorkam
             tail = pengunjungBaru;
         }
 
-        // Tambahkan pengunjung ke dalam queue
         queue<Pengunjung> pengunjungQueue;
         pengunjungQueue.push(*pengunjungBaru);
 
-        // Menghitung total pembayaran
         int hargaKamar = (nomorkamar <= 5) ? 100000 : 250000;
         int totalPembayaran = hargaKamar * lamaMenginap;
         int uangBayar;
@@ -67,26 +64,34 @@ void tambahPengunjung(string nama, int lamaMenginap, string notelp, int nomorkam
         cout << "=================================================" ;
         cout << "\nTotal Harga : " << totalPembayaran << " IDR\n" ;
         cout << "=================================================" ;
-        do{
+        do {
             cout << "\nMasukkan jumlah uang yang dibayarkan: ";
             cin >> uangBayar;
 
-            // Memvalidasi pembayaran
             if (uangBayar >= totalPembayaran) {
                 int kembalian = uangBayar - totalPembayaran;
                 cout << "Pembayaran berhasil. Kembalian: " << kembalian << " IDR" << endl;
             } else {
                 cout << "Pembayaran tidak cukup. Silakan bayar dengan jumlah yang sesuai." << endl;
             }
-        }while(uangBayar < totalPembayaran);
+        } while (uangBayar < totalPembayaran);
 
-        cout << "\nPengunjung dengan nama " << nama << " telah ditambahkan di kamar " << nomorkamar << " dengan kode pesanan " << pengunjungBaru->kodebooking << endl;
-    } else {
-        cout << "Kamar " << nomorkamar << " sudah dipesan\n";
-    }
+
+        //cout << "\nPengunjung dengan nama " <<  nama<< " telah ditambahkan di kamar " << nomorkamar << " dengan kode pesanan " << pengunjungBaru->kodebooking << endl;
+            cout << "\n-------------------------" << endl;
+            cout << "Kamar " << nomorkamar << endl;
+            cout << "Kode Pesanan : " <<  pengunjungBaru->kodebooking << endl;
+            cout << "Nama : " << nama << endl;
+            cout << "Lama Menginap : " << lamaMenginap << " hari" << endl;
+            cout << "Nomor Telepon : " << notelp << endl;
+            cout << "Telah Ditambahkan On ";
+
+            printf("%s", ctime(&my_time));  // ctime() DIGUNAKAN UNTUK MENAMPILKAN WAKTU SKRNG
+                } else {
+                    cout << "Kamar " << nomorkamar << " sudah dipesan\n";
+                }
 }
 
-// Fungsi untuk menghapus pengunjung dari linked list
 void hapusPengunjung(int kodebooking, string nama) {
     if (kodebooking == 0) {
         return;
@@ -99,7 +104,6 @@ void hapusPengunjung(int kodebooking, string nama) {
     while (curr != NULL) {
         if (curr->kodebooking == kodebooking) {
             if (prev == NULL) {
-                // Jika pengunjung yang ingin dihapus berada di head
                 head = curr->next;
             } else {
                 prev->next = curr->next;
@@ -119,8 +123,8 @@ void hapusPengunjung(int kodebooking, string nama) {
     }
 }
 
-// Fungsi untuk menampilkan daftar pengunjung yang sedang menginap
-void tampilDaftarPengunjung() {
+
+    void tampilDaftarPengunjung() {
     Pengunjung* temp = head;
 
     cout << "\nDaftar Pengunjung yang Sedang Menginap:" << endl;
@@ -138,8 +142,8 @@ void tampilDaftarPengunjung() {
             cout << "Lama Menginap : " << temp->lamaMenginap << " hari" << endl;
             cout << "Nomor Telepon : " << temp->notelp << endl;
             cout << "-------------------------";
-        } 
-        
+        }
+
         if (temp->nomorkamar > 5 && temp->nomorkamar <= 10) {
             cout << "\n-------------------------" << endl;
             cout << "Kamar " << temp->nomorkamar << " (Deluxe Room)" << endl;
@@ -149,12 +153,12 @@ void tampilDaftarPengunjung() {
             cout << "Nomor Telepon : " << temp->notelp << endl;
             cout << "-------------------------";
         }
-        
+
         temp = temp->next;
     }
 }
 
-// Fungsi untuk menampilkan kamar-kamar yang tersedia
+
 void tampilKamarTersedia() {
     cout << "== Pilihan Kamar yang Tersedia== " << endl;
     cout << "\n===============" << endl;
@@ -170,10 +174,12 @@ void tampilKamarTersedia() {
     cout << "=============" << endl;
     for (int nomorKamar = 6; nomorKamar <= 10; nomorKamar++) {
         if (isKamarTersedia(nomorKamar)) {
-            cout << "Kamar " << nomorKamar  << endl;
+            cout << "Kamar " << nomorKamar << endl;
         }
     }
 }
+
+
 
 int main() {
     int pilihan;
@@ -184,20 +190,26 @@ int main() {
     int nomorkamar;
     char ulangi;
 
+
     do {
         system("cls");
-        cout << "=========================================" << endl;
-        cout << "|           MENU PEMESANAN HOTEL         |" << endl;
-        cout << "=========================================" << endl;
+        cout << "==========================================" << endl;
+        cout << "Tanggal :    " ; system("date/t");
+        cout << "==========================================" << endl;
+        cout << "|         MENU PEMESANAN HOTEL            |" << endl;
+        cout << "==========================================" << endl;
         cout << "| 1. Pemesanan kamar                      |" << endl;
         cout << "| 2. Hapus Data Pemesanan                 |" << endl;
         cout << "| 3. Daftar Pengunjung                    |" << endl;
         cout << "| 4. Cek Ketersediaan Kamar               |" << endl;
         cout << "| 0. Keluar                               |" << endl;
-        cout << "=========================================" << endl;
+        cout << "|                                         |\n";
+        cout << "|                                         |\n";
+        cout << "==========================================" << endl;
         cout << endl;
         cout << "Pilihan: ";
         cin >> pilihan;
+
 
         switch (pilihan) {
             case 1:
@@ -205,7 +217,6 @@ int main() {
                     system("cls");
                     tampilKamarTersedia();
 
-                    // Memasukkan nomor kamar dan nama pemesan
                     cout << "\n== KETIK 0 UNTUK KEMBALI KE MENU AWAL ==";
                     cout << "\nMasukkan nomor kamar yang ingin dipesan: ";
                     cin >> nomorkamar;
@@ -213,6 +224,7 @@ int main() {
                     if (nomorkamar == 0) {
                         break;
                     }
+
 
                     if (nomorkamar > 0 && nomorkamar <= 10) {
                         if (isKamarTersedia(nomorkamar)) {
@@ -239,10 +251,10 @@ int main() {
                     cout << "\nIngin memesan kamar lagi? (y/n): ";
                     cin >> ulangi;
                 } while (ulangi == 'y' || ulangi == 'Y');
-
                 break;
             case 2:
-                system("cls");
+                do {
+                    system("cls");
                 if (head == NULL) {
                     cout << "Tidak ada pengunjung di kamar." << endl;
                     system("pause");
@@ -254,6 +266,7 @@ int main() {
                 cin >> kodebooking;
                 hapusPengunjung(kodebooking,nama);
                 system("pause");
+                } while (ulangi == 'y' || ulangi == 'Y');
                 break;
             case 3:
                 system("cls");
@@ -264,17 +277,45 @@ int main() {
             case 4:
                 system("cls");
                 tampilKamarTersedia();
-                system("pause");
                 break;
+            case 5:
+                do {
+                    system("cls");
+                    cout << "Masukkan nomor kamar yang ingin dicek ketersediaannya: ";
+                    cin >> nomorkamar;
+
+                    if (isKamarTersedia(nomorkamar)) {
+                        cout << "Kamar " << nomorkamar << " tersedia." << endl;
+                    } else {
+                        cout << "Kamar " << nomorkamar << " sudah dipesan." << endl;
+                    }
+
+                    cout << "\nCek ketersediaan kamar lagi? (y/n): ";
+                    cin >> ulangi;
+                } while (ulangi == 'y' || ulangi == 'Y');
+                break;
+
             case 0:
-                system("cls");
-                cout << "Terima kasih! Sampai jumpa." << endl;
                 break;
             default:
-                cout << "Pilihan tidak valid. Silakan coba lagi." << endl;
-                system("pause");
+                cout << "Pilihan tidak valid." << endl;
+                break;
         }
+
+        if (pilihan != 0) {
+            cout << "\nTekan ENTER untuk melanjutkan...";
+            cin.ignore();
+            cin.get();
+        }
+
     } while (pilihan != 0);
+
+    Pengunjung* curr = head;
+    while (curr != NULL) {
+        Pengunjung* next = curr->next;
+        delete curr;
+        curr = next;
+    }
 
     return 0;
 }

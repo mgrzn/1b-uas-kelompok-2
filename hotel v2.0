@@ -123,19 +123,33 @@ void hapusPengunjung(int kodebooking, string nama) {
 void tampilDaftarPengunjung() {
     Pengunjung* temp = head;
 
+    cout << "\nDaftar Pengunjung yang Sedang Menginap:" << endl;
     if (temp == NULL) {
-        cout << "Tidak ada pengunjung yang sedang menginap." << endl;
+        cout << "\nTidak ada pengunjung yang sedang menginap." << endl;
         return;
     }
 
-    cout << "\nDaftar Pengunjung yang Sedang Menginap:" << endl;
     while (temp != NULL) {
-        cout << "Kamar " << temp->nomorkamar << endl;
-        cout << "Kode Pesanan : " << temp->kodebooking << endl;
-        cout << "Nama : " << temp->nama << endl;
-        cout << "Lama Menginap : " << temp->lamaMenginap << " hari" << endl;
-        cout << "Nomor Telepon : " << temp->notelp << endl;
-        cout << "-------------------------" << endl;
+        if (temp->nomorkamar > 0 && temp->nomorkamar <= 5) {
+            cout << "\n-------------------------" << endl;
+            cout << "Kamar " << temp->nomorkamar << " (Standart Room)" << endl;
+            cout << "Kode Pesanan : " << temp->kodebooking << endl;
+            cout << "Nama : " << temp->nama << endl;
+            cout << "Lama Menginap : " << temp->lamaMenginap << " hari" << endl;
+            cout << "Nomor Telepon : " << temp->notelp << endl;
+            cout << "-------------------------";
+        } 
+        
+        if (temp->nomorkamar > 5 && temp->nomorkamar <= 10) {
+            cout << "\n-------------------------" << endl;
+            cout << "Kamar " << temp->nomorkamar << " (Deluxe Room)" << endl;
+            cout << "Kode Pesanan : " << temp->kodebooking << endl;
+            cout << "Nama : " << temp->nama << endl;
+            cout << "Lama Menginap : " << temp->lamaMenginap << " hari" << endl;
+            cout << "Nomor Telepon : " << temp->notelp << endl;
+            cout << "-------------------------";
+        }
+        
         temp = temp->next;
     }
 }
@@ -156,7 +170,7 @@ void tampilKamarTersedia() {
     cout << "=============" << endl;
     for (int nomorKamar = 6; nomorKamar <= 10; nomorKamar++) {
         if (isKamarTersedia(nomorKamar)) {
-            cout << "Kamar " << nomorKamar << endl;
+            cout << "Kamar " << nomorKamar  << endl;
         }
     }
 }
@@ -172,12 +186,16 @@ int main() {
 
     do {
         system("cls");
-        cout << "\n=== Aplikasi Hotel ===" << endl;
-        cout << "1. Tambah Pengunjung" << endl;
-        cout << "2. Hapus Pengunjung" << endl;
-        cout << "3. Tampilkan Daftar Pengunjung" << endl;
-        cout << "4. Tampilkan Kamar Tersedia" << endl;
-        cout << "0. Keluar" << endl;
+        cout << "=========================================" << endl;
+        cout << "|           MENU PEMESANAN HOTEL         |" << endl;
+        cout << "=========================================" << endl;
+        cout << "| 1. Pemesanan kamar                      |" << endl;
+        cout << "| 2. Hapus Data Pemesanan                 |" << endl;
+        cout << "| 3. Daftar Pengunjung                    |" << endl;
+        cout << "| 4. Cek Ketersediaan Kamar               |" << endl;
+        cout << "| 0. Keluar                               |" << endl;
+        cout << "=========================================" << endl;
+        cout << endl;
         cout << "Pilihan: ";
         cin >> pilihan;
 
